@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Dictionary {
 	BinTree container;
 	
-	Dictionary(BinTree container) {
+	Dictionary (BinTree container) {
 		this.container = container;
 	}
 	/*
@@ -18,6 +18,7 @@ public class Dictionary {
 	 * a combined list of matches from each case
 	*/
 	public ArrayList<CaseInfo> getSimilarWords(String word) {
+
 		ArrayList<CaseInfo> similarWords = new ArrayList<CaseInfo>();
 		
 		String lowerCaseWord = word.toLowerCase();
