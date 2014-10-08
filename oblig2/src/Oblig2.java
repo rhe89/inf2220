@@ -7,12 +7,12 @@ import java.io.FileNotFoundException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-public class Wunderlist {
+public class Oblig2 {
 
 	private Task[] tasks;
 
 	public static void main(String[] args) {
-        Wunderlist projectPlanner = new Wunderlist();
+        Oblig2 projectPlanner = new Oblig2();
         projectPlanner.readFile(args);
         projectPlanner.makeProject();
     }
@@ -24,6 +24,9 @@ public class Wunderlist {
      * @param args Command line arguments
      */
     public void readFile(String [] args) {
+        System.out.println();
+        System.out.println("-----------------------------------------------");
+        System.out.println();
         if (args.length == 0) {
             System.out.println("Her har du nok glemt å sende ved et par argumenter kompis!");
             System.exit(1337);
@@ -36,6 +39,9 @@ public class Wunderlist {
             System.out.println("args[1] er ikke en Integer! Fiks!");
             System.exit(1337);
         }
+        if (manpower == 999) {
+            System.out.println("Unlimited manpower!");
+        }
         File file = new File(filename);
         Scanner read = null;
 
@@ -45,7 +51,7 @@ public class Wunderlist {
             System.out.println("Fil ikke funnet!");
             System.exit(1337);
         }
-
+        System.out.println("********** " + filename + " **********");
         int taskCount = read.nextInt();
         tasks = new Task[taskCount];
 

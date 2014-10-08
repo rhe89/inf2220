@@ -9,7 +9,6 @@ public class Task {
     private ArrayList<Task> earliestStartSet;
 	private String name;
 	private Edge outEdges;
-    public Task previous;
 	public int state;
 	private boolean allInfo = false;
 
@@ -121,27 +120,41 @@ public class Task {
         if (earliestStartSet.size() == cntPredecessors){
             for (Edge tmp = outEdges; tmp != null; tmp = tmp.next) {
                 Task dependent = tmp.getTaskTo();
-                dependent.calculateEarliestStart((earliestStart + time), this);
+                dependent.calculateEarliestStart(earliestStart + time, this);
             }
         }
     }
 
-    public void calculateLatestStart(Project myProject) {
+    /***
+     * The first check is to see if a task doesn't have any dependencies.
+     * In that case, the slack  is set to the running time of the
+     * project, minus its earliest start and time to complete its work.
+     *
+     * If it has dependecies, it is necessary to find the child with
+     * the lowest earliest start. After that, the tasks slack
+     * is set to that value, minus its earliest start and time to complete its
+     * work, just like the case above.
+     *
+     * In both cases, the tasks latest start is its earliest start plus
+     * its calculated slack.
+     *
+     * @param projectRunningTime The total running time of the project.
+     */
+    public void calculateLatestStart(int projectRunningTime) {
+        int slack;
         if (outEdges == null) {
-            int slack = myProject.projectRunningTime - earliestStart - time;
-            latestStart =  earliestStart + slack;
-
+            slack = projectRunningTime - earliestStart - time;
         } else {
             int minOfChildren = Integer.MAX_VALUE;
-
             for (Edge e = outEdges; e != null; e = e.next) {
                 if (e.getTaskTo().earliestStart < minOfChildren) {
                     minOfChildren = e.getTaskTo().earliestStart;
                 }
             }
-            int slack = minOfChildren - earliestStart  - time;
-            latestStart =  earliestStart + slack;
+            slack = minOfChildren - earliestStart  - time;
         }
+        latestStart = earliestStart + slack;
+
     }
 
     /***

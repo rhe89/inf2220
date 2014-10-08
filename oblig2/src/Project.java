@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Project {
 	private Task[] tasks, tmpTasks;
-    private ArrayList<Task> topSort = new ArrayList<Task>();
+    private ArrayList<Task> topSort = new ArrayList<Task>(), cycleTrace = new ArrayList<Task>();
     private final int RUNNING = 1, FINISHED = 2, NOT_STARTED = 3;
     public int projectRunningTime;
 
@@ -31,8 +31,6 @@ public class Project {
 
         resetAllTasks();
         runProject();
-
-        listTasks();
 	}
 
     /***
@@ -65,13 +63,14 @@ public class Project {
     /***
      * Initializes the check for cycles in the graph.
      *
-     * @see #checkForCycle(Task, Task)
+     * @see #checkForCycle(Task)
      */
     public void checkIfReliazable() {
-
         for (Task t : tasks) {
-            checkForCycle(t, null);
+            if (t.state != FINISHED && t.getOutEdges() != null)
+                checkForCycle(t);
         }
+
         System.out.println("No cycle detected. Project is realizable!");
     }
 
@@ -84,53 +83,56 @@ public class Project {
      * up back at the parent-node. If so, the STARTED-mark is set, and a cycle has been detected.
      * If not, the search continues until all the tasks' mark is set to FINISHED.
      *
+     * Uses and ArrayList to keep hold of where in the graph the cycle occured
+     *
      * @param task The task in which the check for cycles should start from.
-     * @param cameFrom The previous task, used to backtrace a possible cycle.
-     * @see #printCycleTrace(Task)
+     * @see #printCycleTrace()
      * @see Edge
      * @see Task#getId()
      */
-	public void checkForCycle(Task task, Task cameFrom) {
-        Edge tmp = task.getOutEdges();
-
-        if (cameFrom == null)
-            cameFrom = task;
-        else
-            cameFrom.previous = task;
-
+	public void checkForCycle(Task task) {
         if (task.state == RUNNING) {
             System.out.println("Cycle detected at task " + task.getId());
-            printCycleTrace(task);
-            System.exit(1);
+            cycleTrace.add(task);
+            printCycleTrace();
+            System.exit(3);
         } else if (task.state == NOT_STARTED) {
             task.state = RUNNING;
+            cycleTrace.add(task);
+            Edge tmp = task.getOutEdges();
+
             for (Edge e = tmp; e != null; e = e.next) {
-                checkForCycle(e.getTaskTo(), cameFrom);
+                checkForCycle(e.getTaskTo());
             }
             task.state = FINISHED;
         }
 	}
 
     /***
-     * Iterates through the linked list of tasks in the cycle created in
+     * Iterates through the list of tasks in the cycle created in
      * checkForCycle(), to spot where a cycle has been detected.
      *
-     * @param cameFrom The task in which a cycle has been detected
      */
-    private void printCycleTrace(Task cameFrom) {
+    private void printCycleTrace() {
         System.out.println("Printing trace: ");
-        Task tmp = cameFrom;
-        while (tmp != null) {
-            System.out.print(tmp.getId() + " -> ");
-            tmp = tmp.previous;
-        }
 
+        for (Task t : cycleTrace) {
+            String state = null;
+            if (t.state == 1) {
+                state = "RUNNING";
+            } else if (t.state == 2) {
+                state = "NOT_STARTED";
+            } else if (t.state == 3) {
+                state = "FINISHED";
+            }
+            System.out.println(t.getId() + " (State: " + state + ")");
+        }
         System.out.println();
     }
 
     /***
      * Calculates each task's earliest start recursively, by starting at each task with zero indegrees.
-     * If the graph has no cycles, one can be sure that every task with an indegree > 0 will
+     * If the graph has no cycles, one can be sure that every task with an indegree larger than 0 will
      * be visited if one starts with the task's with zero indegrees.
      *
      * @see Task#calculateEarliestStart(int, Task)
@@ -145,15 +147,21 @@ public class Project {
     }
 
     /***
-     *
-     * @see Task#calculateLatestStart(Project)
+     * Uses a reverse iteration of the top sorted list
+     * @see Task#calculateLatestStart(int)
      */
     private void calculateLatestStart() {
         int size = topSort.size();
 
-        for (int i = size - 1; i >= 0; i--) {
-            topSort.get(i).calculateLatestStart(this);
+        /*
+        for (Task t : tasks) {
+            t.calculateLatestStart(projectRunningTime);
         }
+        */
+        for (int i = size - 1; i >= 0; i--) {
+            topSort.get(i).calculateLatestStart(projectRunningTime);
+        }
+
     }
 
     /***
@@ -163,7 +171,6 @@ public class Project {
      * each task's latest start, where the list is iterated
      * through from end to beginning in order to get the correct
      * latest start.
-     *
      *
      * @see Edge
      * @see Edge#getTaskTo()
@@ -214,7 +221,7 @@ public class Project {
      *
      */
     private void runProject() {
-        int timeUnits = 0, currStaff = 0, tmpStaff = 0, tmpTime = 0;
+        int timeUnits = 0, currStaff = 0, tmpStaff = -1, tmpTime = -1;
 
         /***
          * The queue will always be filled with tasks that has no dependencies (indegrees)
@@ -227,30 +234,14 @@ public class Project {
             }
         }
 
+        System.out.println("\nTime: " + timeUnits + " ************");
+
         while (timeUnits <= projectRunningTime) {
             boolean increaseTime = true;
-
-            if (timeUnits != tmpTime) {
-                System.out.println("\nTime: " + timeUnits + " ************");
-            }
 
             tmpStaff = currStaff;
             tmpTime = timeUnits;
 
-            /***
-             * Checking which tasks that are ready to start at the current time unit,
-             * and changing their state to RUNNING. Increasing the current
-             * working staff on the project
-             */
-
-
-            for (Task t : queue) {
-                if (t.getEarliestStart() == timeUnits && t.state == NOT_STARTED) {
-                    System.out.println("\t\tStarting:   " + t.getId());
-                    t.state = RUNNING;
-                    currStaff += t.getStaff();
-                }
-            }
 
             /***
              * Checking which tasks that are finished working at the current time unit.
@@ -259,15 +250,27 @@ public class Project {
              * iterating trough the list an unnecessary number of times. Each task that finishes,
              * is of course removed from the queue.
              *
+             * In the same loop i'm checking which tasks that are ready to start at the current time unit,
+             * and changing their state to RUNNING. Increasing the current
+             * working staff on the project
+             *
              * When a task is finished, it will decrease its children's predecessor, just
-             * like a topoligical sorting would to. Thus, this part is a (kind of) version
-             * of topological sorting.
+             * like a topoligical sorting would to. Thus, this is where the topoligical
+             * sorting happens in this method.
              */
-
+            boolean beenHere = false;
             ListIterator<Task> queueIterator = queue.listIterator();
             while (queueIterator.hasNext()) {
                 Task t = queueIterator.next();
-                if (t.getEarliestStart() + t.getTime() == timeUnits && t.state == RUNNING) {
+                if (t.getEarliestStart() == timeUnits && t.state == NOT_STARTED) {
+                    System.out.println("\t\tStarting:   " + t.getId());
+                    t.state = RUNNING;
+                    currStaff += t.getStaff();
+                } else if (t.getEarliestStart() + t.getTime() == timeUnits && t.state == RUNNING) {
+                    if (!beenHere) {
+                        System.out.println("\nTime: " + (timeUnits) + " ************");
+                        beenHere = true;
+                    }
                     System.out.println("\t\tFinished:   " + t.getId());
                     t.state = FINISHED;
                     t.decreaseMyChildrensDepencies();
@@ -291,12 +294,13 @@ public class Project {
                     }
                 }
             }
+
             if (increaseTime) timeUnits++;
 
             /***
-             * Just to avoid printing current staff when there isn't much happening
+             * A bit of a last resort just to get print out properly configures
              */
-            if (tmpStaff != currStaff) {
+            if (timeUnits != tmpTime && tmpStaff != currStaff) {
                 System.out.println("\tCurrent staff:  " + currStaff);
                 System.out.println("*********************");
                 try {
@@ -305,18 +309,9 @@ public class Project {
                     e.printStackTrace();
                 }
             }
-
         }
 
-        for (Task t : tmpTasks) {
-            if (t.state == FINISHED)
-                System.out.println("Task: "+ t.getId() + "'s state: " + FINISHED + " (FINISHED).");
-            else if (t.state == RUNNING)
-                System.out.println("Task: "+ t.getId() + "'s state: " + RUNNING + " (RUNNING).");
-            else if (t.state == NOT_STARTED)
-                System.out.println("Task: "+ t.getId() + "'s state: " + NOT_STARTED + " (NOT_STARTED).");
-        }
-
+        System.out.println("Shortest possible project run time is: " + projectRunningTime + "\n\n");
     }
 
     /***
