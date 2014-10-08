@@ -1,0 +1,35 @@
+Kompleksitet:
+
+2.1 Realizability og 3.1 Handling circular dependencies
+Method(s):  checkIfReliazable() og checkForCycle i Project.
+
+Kompleksitet: O(n^2)
+Kommentar: Itererer gjennom hele lista av oppgaver, deretter gjennom hver
+oppgaves utgrader. Derav to løkker totalt i verste fall.
+
+--------------------------
+
+2.2 Optimal use of resources (optimizing time) og 3.2 Parallel tasks: Start tasks as soon as possible
+Method(s):  runProject() i Project
+
+Kompleksitet: O(n^2)
+Kommentar: Har en while-løkke som kjører til tiden er ute.
+Inni while-løkken er det to uavhengige løkker som kjører (altså begge er lineære).
+
+--------------------------
+
+3.3 Finding critical tasks
+Methods: calculateLatestStart(), calculateEarliestStart() i Task og listTasks() i Project.
+Kompleksitet: calculateLatestStart(): o(n^2)
+              calculateEarliestStart(): o(n^2)
+              listTasks(): o(n)
+Kommentar: å finne tidligste start og seneste start for en node har begge o(n^2). Der
+må det itereres gjennom lista, for så å iterere gjennom utgradene. Å skrive ut alle oppgavene
+og medfølgende info tar lineær tid.
+
+Generelt er det vanskelig å komme utenom (slik jeg ser det) å måtte
+først iterere gjennom grafen, for deretter å ta for seg hver nodes
+avhengigheter, altså to løkker, i de operasjonene som må gjøres i oppgaven.
+
+Hadde satt pris på forslag til alternative løsninger hvis
+det ikke er altfor tidkrevende! :)
