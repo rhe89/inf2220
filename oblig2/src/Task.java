@@ -127,34 +127,27 @@ public class Task {
 
     /***
      * The first check is to see if a task doesn't have any dependencies.
-     * In that case, the slack  is set to the running time of the
-     * project, minus its earliest start and time to complete its work.
+     * In that case, the latest start of the task is the totalt project run-time,
+     * minus the time the task uses to finish its work.
      *
      * If it has dependecies, it is necessary to find the child with
-     * the lowest earliest start. After that, the tasks slack
-     * is set to that value, minus its earliest start and time to complete its
-     * work, just like the case above.
-     *
-     * In both cases, the tasks latest start is its earliest start plus
-     * its calculated slack.
+     * the highest earliest start (max). The latest start is then decided
+     * by subtracting the tasks time from max.
      *
      * @param projectRunningTime The total running time of the project.
      */
     public void calculateLatestStart(int projectRunningTime) {
-        int slack;
         if (outEdges == null) {
-            slack = projectRunningTime - earliestStart - time;
+            latestStart = projectRunningTime - time;
         } else {
-            int minOfChildren = Integer.MAX_VALUE;
+            int max = 0;
             for (Edge e = outEdges; e != null; e = e.next) {
-                if (e.getTaskTo().earliestStart < minOfChildren) {
-                    minOfChildren = e.getTaskTo().earliestStart;
+                if (e.getTaskTo().earliestStart > max) {
+                    max = e.getTaskTo().earliestStart;
                 }
             }
-            slack = minOfChildren - earliestStart  - time;
+            latestStart = max - time;
         }
-        latestStart = earliestStart + slack;
-
     }
 
     /***
