@@ -1,0 +1,328 @@
+Wildcards: 1
+****** SHIFT TABLE *****
+
+INDEX	CHAR	SHIFT
+0		c		1
+Other	Other	2
+
+******** HAYSTACK *******
+ 00| 01| 02| 03| 04| 05| 06| 07| 08| 09| 10| 11| 12| 13| 14|
+ c | o | g | w | r | g | a | c | c | a | g | a | c | o | g |
+
+********* NEEDLE ********
+ 00| 01| 02|
+ c | _ | g |
+
+** BAD CHARACTER SHIFT **
+
+Char match at haystack[2]!
+
+Char match at haystack[1]!
+
+Needle match at haystack[0]!
+In haystack:
+[0][1][2]
+[c][o][g]
+
+Char match at haystack[3]!
+
+Mismatch at index [2] Character: 'g'
+
+Mismatch at index [6] Character: 'a'
+
+Mismatch at index [7] Character: 'c'
+
+Mismatch at index [8] Character: 'c'
+
+Mismatch at index [9] Character: 'a'
+
+Char match at haystack[10]!
+
+Char match at haystack[9]!
+
+Needle match at haystack[8]!
+In haystack:
+[8][9][10]
+[c][a][ g]
+
+Char match at haystack[11]!
+
+Mismatch at index [10] Character: 'g'
+
+Mismatch at index [13] Character: 'o'
+
+Char match at haystack[14]!
+
+Char match at haystack[13]!
+
+Needle match at haystack[12]!
+In haystack:
+[12][13][14]
+[ c][ o][ g]
+
+**************************************************************************************
+
+Wildcards: 2
+****** SHIFT TABLE *****
+
+INDEX	CHAR	SHIFT
+0		c		1
+Other	Other	1
+
+******** HAYSTACK *******
+ 00| 01| 02| 03| 04| 05| 06| 07| 08| 09| 10| 11| 12| 13| 14|
+ c | o | g | w | r | g | a | c | c | a | g | a | c | o | g |
+
+********* NEEDLE ********
+ 00| 01| 02|
+ c | _ | _ |
+
+** BAD CHARACTER SHIFT **
+
+Char match at haystack[2]!
+
+Char match at haystack[1]!
+
+Needle match at haystack[0]!
+In haystack:
+[0][1][2]
+[c][o][g]
+
+Char match at haystack[2]!
+
+Mismatch at index [1] Character: 'o'
+
+Char match at haystack[4]!
+
+Char match at haystack[3]!
+
+Mismatch at index [2] Character: 'g'
+
+Char match at haystack[5]!
+
+Char match at haystack[4]!
+
+Mismatch at index [3] Character: 'w'
+
+Char match at haystack[6]!
+
+Char match at haystack[5]!
+
+Mismatch at index [4] Character: 'r'
+
+Char match at haystack[7]!
+
+Char match at haystack[6]!
+
+Mismatch at index [5] Character: 'g'
+
+Char match at haystack[8]!
+
+Char match at haystack[7]!
+
+Mismatch at index [6] Character: 'a'
+
+Char match at haystack[9]!
+
+Char match at haystack[8]!
+
+Needle match at haystack[7]!
+In haystack:
+[7][8][9]
+[c][c][a]
+
+Char match at haystack[9]!
+
+Needle match at haystack[8]!
+In haystack:
+[8][9][10]
+[c][a][ g]
+
+Char match at haystack[10]!
+
+Mismatch at index [9] Character: 'a'
+
+Char match at haystack[12]!
+
+Char match at haystack[11]!
+
+Mismatch at index [10] Character: 'g'
+
+Char match at haystack[13]!
+
+Char match at haystack[12]!
+
+Mismatch at index [11] Character: 'a'
+
+Char match at haystack[14]!
+
+Char match at haystack[13]!
+
+Needle match at haystack[12]!
+In haystack:
+[12][13][14]
+[ c][ o][ g]
+
+**************************************************************************************
+
+Wildcards: 3
+****** SHIFT TABLE *****
+
+The needle only contains wildcards! No need to construct the shift table.
+******** HAYSTACK *******
+ 00| 01| 02| 03| 04| 05| 06| 07| 08| 09| 10| 11| 12| 13| 14|
+ c | o | g | w | r | g | a | c | c | a | g | a | c | o | g |
+
+********* NEEDLE ********
+ 00| 01| 02|
+ _ | _ | _ |
+
+** BAD CHARACTER SHIFT **
+
+Char match at haystack[2]!
+
+Char match at haystack[1]!
+
+Needle match at haystack[0]!
+In haystack:
+[0][1][2]
+[c][o][g]
+
+Char match at haystack[2]!
+
+Needle match at haystack[1]!
+In haystack:
+[1][2][3]
+[o][g][w]
+
+Char match at haystack[3]!
+
+Needle match at haystack[2]!
+In haystack:
+[2][3][4]
+[g][w][r]
+
+Char match at haystack[4]!
+
+Needle match at haystack[3]!
+In haystack:
+[3][4][5]
+[w][r][g]
+
+Char match at haystack[5]!
+
+Needle match at haystack[4]!
+In haystack:
+[4][5][6]
+[r][g][a]
+
+Char match at haystack[6]!
+
+Needle match at haystack[5]!
+In haystack:
+[5][6][7]
+[g][a][c]
+
+Char match at haystack[7]!
+
+Needle match at haystack[6]!
+In haystack:
+[6][7][8]
+[a][c][c]
+
+Char match at haystack[8]!
+
+Needle match at haystack[7]!
+In haystack:
+[7][8][9]
+[c][c][a]
+
+Char match at haystack[9]!
+
+Needle match at haystack[8]!
+In haystack:
+[8][9][10]
+[c][a][ g]
+
+Char match at haystack[10]!
+
+Needle match at haystack[9]!
+In haystack:
+[9][10][11]
+[a][ g][ a]
+
+Char match at haystack[11]!
+
+Needle match at haystack[10]!
+In haystack:
+[10][11][12]
+[ g][ a][ c]
+
+Char match at haystack[12]!
+
+Needle match at haystack[11]!
+In haystack:
+[11][12][13]
+[ a][ c][ o]
+
+Char match at haystack[13]!
+
+Needle match at haystack[12]!
+In haystack:
+[12][13][14]
+[ c][ o][ g]
+
+**************************************************************************************
+
+Wildcards: 1
+****** SHIFT TABLE *****
+
+INDEX	CHAR	SHIFT
+1		o		1
+Other	Other	2
+
+******** HAYSTACK *******
+ 00| 01| 02| 03| 04| 05| 06| 07| 08| 09| 10| 11| 12| 13| 14|
+ c | o | g | w | r | g | a | c | c | a | g | a | c | o | g |
+
+********* NEEDLE ********
+ 00| 01| 02|
+ _ | o | g |
+
+** BAD CHARACTER SHIFT **
+
+Char match at haystack[2]!
+
+Char match at haystack[1]!
+
+Needle match at haystack[0]!
+In haystack:
+[0][1][2]
+[c][o][g]
+
+Mismatch at index [3] Character: 'w'
+
+Char match at haystack[5]!
+
+Mismatch at index [4] Character: 'r'
+
+Mismatch at index [6] Character: 'a'
+
+Mismatch at index [8] Character: 'c'
+
+Char match at haystack[10]!
+
+Mismatch at index [9] Character: 'a'
+
+Mismatch at index [11] Character: 'a'
+
+Mismatch at index [13] Character: 'o'
+
+Char match at haystack[14]!
+
+Char match at haystack[13]!
+
+Needle match at haystack[12]!
+In haystack:
+[12][13][14]
+[ c][ o][ g]
