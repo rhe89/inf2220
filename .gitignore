@@ -2,5 +2,6 @@
 *.class
 *.iml
 *.tgz
-
+javadoc/
 roarher/
+*.tar
