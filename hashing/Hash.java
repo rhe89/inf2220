@@ -21,9 +21,6 @@ public class Hash {
         int count = 0;
 
         while (hashArray[index] != key) {
-            index = linearprobing(count++);
-
-            index = quadraticProbing(count++);
 
             index = hash2(key, count++);
         }
@@ -36,9 +33,7 @@ public class Hash {
         int count = 0;
 
         while (hashArray[index] != key) {
-            index = linearprobing(count++);
-
-            index = quadraticProbing(count++);
+            
 
             index = hash2(key, count++);
         }
@@ -54,9 +49,6 @@ public class Hash {
         int count = 0;
 
         while (isOccupied(index)) {
-            index = linearprobing(count++);
-
-            index = quadraticProbing(count++);
 
             index = hash2(key, count++);
         }
@@ -100,8 +92,6 @@ public class Hash {
         }
         return true;
     }
-
-    //Separate chaining
 
     private boolean rehashNeeded() {
         return ( (double) currNr / tableSize > 0.75);
