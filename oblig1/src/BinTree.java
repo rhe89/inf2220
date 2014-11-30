@@ -39,7 +39,7 @@ public class BinTree {
 	}
 
 	/*
-	 * The case to solve here instead of in the UKE_39.uke38.uke39.Node class is if the root is
+	 * The case to solve here instead of in the Node class is if the root is
 	 * the node to be removed in a non-empty tree. Then the smallest
 	 * value in the roots right subtree has to be set as the new root,
 	 * and that value has to be removed from the right subtree using recursion

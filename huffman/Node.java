@@ -1,27 +1,67 @@
+/**
+ * Created by Roar on 29.11.14.
+ */
 public class Node {
-    int freq;
-    String nodes = "";
 
-    boolean leaf, merged = false;
+    public Node left, right;
+    private String c;
+    private int freq;
+    public boolean leaf;
+    private String bitRep;
 
-    void incrFreq() {
+    Node(String c, int freq, Node left, Node right) {
+        this.c = c;
+        this.freq = freq;
+        this.left = left;
+        this.right = right;
+
+    }
+
+    public void print() {
+
+        if (left != null) {
+            left.print();
+        }
+        if (right != null) {
+            right.print();
+        }
+        System.out.println("Char value: " + c);
+    }
+
+    public void incrFreq() {
         freq++;
     }
 
-    boolean isLeaf() {
+    public boolean isLeaf() {
         return leaf;
     }
-
     public int getFreq() {
         return freq;
     }
 
-    public void addNodes(String newNode) {
-        nodes += newNode;
+    public String getChar() {
+        return c;
     }
-    public String toString() {
-        return nodes;
+    public void setBitRep(String bit) {
+        bitRep = bit;
+    }
+    public String getBitRep() {
+        return bitRep;
     }
 
+    public String getCharFromBit(String code) {
+
+        if (left != null) {
+            left.getCharFromBit(code);
+        }
+        if (right != null) {
+            right.getCharFromBit(code);
+        }
+        if (code.equals(bitRep)) {
+            return c;
+        } else {
+            return "-1";
+        }
+    }
 
 }

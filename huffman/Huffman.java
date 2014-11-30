@@ -1,193 +1,126 @@
 import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
 
-/**
- * Created by Roar on 27.10.14.
- */
 public class Huffman {
+    Node root;
+    String bitFile = "", text, convertedText;
+    int counter = 0;
+    int[] freq = new int[256];
+    BitCode[] bitTable;
+    Heap binHeap;
 
-    String file, text, bitFile = "", convertedText = "";
-    Node [] heap;
-    BitCode [] bitTable;
-    int size, currSize = 0;
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         new Huffman(args[0], args[1]);
     }
 
-    Huffman(String file, String size) {
-        this.file = file;
-        this.size = Integer.parseInt(size);
-        heap = new Node[this.size];
-        bitTable = new BitCode[this.size];
-        readFile();
+    Huffman(String file, String size) throws Exception{
+
+        this.text = new Scanner(new File(file)).nextLine();
+        genFreqTable(text);
+        binHeap = new Heap(Integer.parseInt(size));
     }
-
-    private void readFile() {
-
-        try {
-            text = new Scanner(new File(file)).nextLine();
-        } catch (IOException e) {
-            System.out.println(new File("").getAbsolutePath());
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        generateFrequencies();
-        System.out.println("Merging:");
-        generateHeap();
-        generateBitRepresentations(currSize-1, "");
-        System.out.println("\nBit-table");
-        generateBitTable();
-        System.out.println("\nFile with bit values");
-        generateBitFile();
-        System.out.println(bitFile);
-        System.out.println("\nConverted text");
-        generateTextFromBitCode();
-        System.out.println(convertedText);
-    }
-
-    private void generateFrequencies() {
-
+    /* Use an int-array and char-indexes to increase each char's frequences
+     */
+    private void genFreqTable(String text) {
         char[] arr = text.toCharArray();
 
         for (int i = 0; i < arr.length; i++) {
-            if (getChar(arr[i]) == null) {
-                heap[currSize++] = new Leaf(arr[i], 1);
-            } else {
-                getChar(arr[i]).incrFreq();
+            freq[arr[i]]++;
+        }
+        buildHeap();
+    }
+
+    //Insert every char with a frequency > 0 in the Heap
+    private void buildHeap() {
+        int freqCounter = 0;
+
+        for (int i = 0; i < freq.length; i++) {
+            if (freq[i] > 0) {
+                Node n = new Node(""+(char)i, freq[i], null, null);
+                n.leaf = true;
+                binHeap.insert(n);
+                freqCounter++;
             }
-
         }
 
+        bitTable = new BitCode[freqCounter];
+        buildFreqTree();
     }
 
-    Node getChar(char c) {
-        for (int i = 0; i < currSize; i++) {
-            Leaf tmp = (Leaf) heap[i];
-            if (tmp.getVal() == c)
-                return heap[i];
+    /* While the heap contains more than one item, do two
+    deleteMins and use the two nodes return to construct
+    a parent with the two nodes as children (left and right)
+    and their combined frequences as the parents frequency */
+    private void buildFreqTree() {
+        while(binHeap.getSize() > 1) {
+            Node right = binHeap.deleteMin();
+            System.out.println(right.getChar() + ": " + right.getFreq());
+            Node left = binHeap.deleteMin();
+            System.out.println(left.getChar() + ": " + left.getFreq() + "\n");
+
+            Node parent = new Node(left.getChar()+" "+right.getChar(), left.getFreq()+right.getFreq(), left, right);
+            parent.leaf = false;
+            binHeap.insert(parent);
         }
-        return null;
+
+        root = binHeap.deleteMin();
+        traverseTreeAndSetBitCodes(root, "");
     }
 
-    private void generateHeap() {
-        int min1 = getMin();
-        if (min1 != -1) heap[min1].merged = true;
-        int min2 = getMin();
-        if (min2 != -1) heap[min2].merged = true;
-        boolean finished = false;
+    /* Do an ordinary binary tree traversal and set bit codes for left (0) and right (1)
+    until you reach a leaf-node (which is a char) */
+    private void traverseTreeAndSetBitCodes(Node node, String bit) {
 
-
-        if (min1 != -1 && min2 != -1) {
-            int freq = heap[min1].getFreq() + heap[min2].getFreq();
-            heap[currSize] = new Parent(freq, min2, min1);
-            
-            heap[currSize].addNodes(heap[min1].toString());
-            heap[currSize].addNodes(heap[min2].toString());
-            System.out.println("Merged: " + heap[min1].toString() + "["+min1+"] and " + heap[min2].toString()+"[" +min2 +"] - Freq: " + heap[currSize].getFreq()+"["+currSize+++"]");
-
+        if (node != null && !node.isLeaf()) {
+            traverseTreeAndSetBitCodes(node.left, bit+"0");
+            traverseTreeAndSetBitCodes(node.right, bit+"1");
         } else {
-            finished = true;
+            node.setBitRep(bit);
+            bitTable[counter] = new BitCode(node.getChar(), node.getBitRep());
+            System.out.println("Char: " + bitTable[counter].c + " Code: " + bitTable[counter++].code);
         }
-        if (!finished)
-            generateHeap();
-        else {
-
-        }
-
+        generateBitFile();
     }
 
-    private int getMin() {
-
-        int min = Integer.MAX_VALUE;
-        int tmp = -1;
-
-        for (int i = 0; i < currSize; i++) {
-
-            if (!heap[i].merged) {
-
-                if (heap[i].getFreq() <= min) {
-                    min = heap[i].getFreq();
-                    tmp = i;
-
-                }
-
-            }
-
-        }
-
-        return tmp;
-
-    }
-
-    private void generateBitRepresentations(int index, String bit) {
-
-        if (heap[index].isLeaf()) {
-
-            Leaf leaf = (Leaf) heap[index];
-            leaf.addBit(bit);
-
-        } else {
-
-            Parent par = (Parent) heap[index];
-            generateBitRepresentations(par.left, bit+"0");
-            generateBitRepresentations(par.right, bit+"1");
-
-        }
-    }
-
-    private void generateBitTable() {
-        int counter = 0;
-        for (int i = 0; i < currSize; i++) {
-            if (heap[i].isLeaf()) {
-                Leaf leaf = (Leaf) heap[i];
-                bitTable[counter] = new BitCode(leaf.getVal(), leaf.getBitValue());
-                System.out.println("Char: " + bitTable[counter].c + " Code: " + bitTable[counter++].code);
-            }
-        }
-    }
-
+    //Generate the bitFile by getting the code representing each char in the string
     private void generateBitFile() {
 
         for (int i = 0; i < text.length(); i++) {
-            bitFile += getBitCode(text.charAt(i));
+            bitFile += getBitCode(""+text.charAt(i));
         }
     }
 
+    //Generate the text from the bitcode by getting the char represented by each code
     private void generateTextFromBitCode() {
         int currIndex = 0;
         for (int i = 0; i <= bitFile.length(); i++) {
 
             String letter = bitFile.substring(currIndex,i);
-            char c = getBitValue(letter);
-            if (c != '9') {
+
+            String c = getBitValue(letter);
+
+            if (!c.equals("9")) {
                 convertedText += ""+c;
                 currIndex = i;
             }
-
         }
     }
 
-    private String getBitCode(char c) {
+    private String getBitCode(String c) {
         for (int i = 0; i < bitTable.length; i++) {
-            if (bitTable[i].c == c) {
+            if (bitTable[i].c.equals(c)) {
                 return bitTable[i].code;
             }
         }
         return "-1";
     }
 
-    private char getBitValue(String code) {
+    private String getBitValue(String code) {
         for (int i = 0; i < bitTable.length; i++) {
             if (bitTable[i] != null && bitTable[i].code.equals(code)) {
                 return bitTable[i].c;
             }
         }
-        return '9';
+        return "9";
     }
-
-
 }
-
