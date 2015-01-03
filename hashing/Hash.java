@@ -77,9 +77,10 @@ public class Hash {
     private int getLargestPrime() {
         int prime = 0;
 
-        for (int i = 0; i < tableSize; i++) {
+        for (int i = tableSize-1; i > 0; i--) {
             if (isPrime(i)) {
                 prime = i;
+                break;
             }
         }
 

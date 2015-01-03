@@ -6,7 +6,7 @@ public class BinTree {
 	private Node root;
 	public int nodeCountAtLevels[], nodeCount, totDepth, maxDepth;
 	
-	public void insert  (String word) {
+	public void insert (String word) {
 		String lowerCaseWord = word.toLowerCase();
 		if (root == null) {
 			root = new Node(lowerCaseWord);

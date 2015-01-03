@@ -93,6 +93,7 @@ public class Project {
      * @see Task#getId()
      */
 	public void checkForCycle(Task task) {
+
         if (task.state == RUNNING) {
             System.out.println("Cycle detected at task " + task.getId());
             cycleTrace.add(task);
